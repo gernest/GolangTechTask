@@ -9,6 +9,7 @@ import (
 
 	"github.com/buffup/GolangTechTask/api"
 	"github.com/urfave/cli"
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
@@ -75,20 +76,31 @@ func command(ctx *cli.Context) error {
 
 func run(ctx context.Context, c *Config) error {
 	m := Logger.Named("main")
+	m.Info("Opening storage")
+	store, err := NewStore(c)
+	if err != nil {
+		return err
+	}
+	m.Info("Setting up open telemetry")
+	tp, err := CreateOpenTelemetry()
+	if err != nil {
+		return err
+	}
 	m.Info("Starting listener for votable service", zap.Int("port", c.Port))
 	ls, err := net.Listen("tcp", fmt.Sprintf(":%d", c.Port))
 	if err != nil {
 		return err
 	}
-	store, err := NewStore(c)
-	if err != nil {
-		return err
-	}
+	defer tp.Shutdown(context.Background())
+
 	return serve(ctx, store, c, ls)
 }
 
 func serve(ctx context.Context, store Store, c *Config, ls net.Listener) error {
-	s := grpc.NewServer()
+	s := grpc.NewServer(
+		grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()),
+		grpc.StreamInterceptor(otelgrpc.StreamServerInterceptor()),
+	)
 	api.RegisterVotingServiceServer(s, &Server{
 		store: store,
 	})
