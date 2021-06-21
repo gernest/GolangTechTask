@@ -13,6 +13,18 @@ func TestServer_memStore(t *testing.T) {
 	VotingServerTest(t, NewMemStore())
 }
 
+func TestServer_dynamo(t *testing.T) {
+	c := &Config{
+		Region:   "local",
+		Endpoint: "http://localhost:8000",
+	}
+	db, err := NewDynamo(c)
+	if err != nil {
+		t.Fatal(err)
+	}
+	VotingServerTest(t, db)
+}
+
 func VotingServerTest(t *testing.T, store Store) {
 	t.Run("CreateVoteable", func(t *testing.T) {
 		if err := store.Clear(); err != nil {
