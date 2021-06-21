@@ -9,9 +9,15 @@ import (
 	"github.com/google/uuid"
 )
 
-func TestServer(t *testing.T) {
+func TestServer_memStore(t *testing.T) {
+	VotingServerTest(t, NewMemStore())
+}
+
+func VotingServerTest(t *testing.T, store Store) {
 	t.Run("CreateVoteable", func(t *testing.T) {
-		store := NewMemStore()
+		if err := store.Clear(); err != nil {
+			t.Fatal(err)
+		}
 		svr := &Server{store: store}
 		vo := &api.CreateVoteableRequest{
 			Question: "To be or not to be?",
@@ -30,7 +36,9 @@ func TestServer(t *testing.T) {
 	})
 
 	t.Run("ListVoteables", func(t *testing.T) {
-		store := NewMemStore()
+		if err := store.Clear(); err != nil {
+			t.Fatal(err)
+		}
 		svr := &Server{store: store}
 		ctx := context.TODO()
 		total := 20

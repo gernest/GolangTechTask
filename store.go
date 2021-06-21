@@ -21,6 +21,9 @@ type Store interface {
 	Create(ctx context.Context, question string, answers []string) (uuid string, ee error)
 	List(ctx context.Context, lastResultIndex int64, limit int) (result []*api.Voteable, lastIndex int64, err error)
 	Cast(ctx context.Context, id string, answer int) error
+	// Clear is needed for testing purpose only. This deletes everything and resets
+	// the storage state
+	Clear() error
 }
 
 var _ Store = (*MemStore)(nil)
@@ -28,6 +31,19 @@ var _ Store = (*MemStore)(nil)
 type MemStore struct {
 	va  *sync.Map
 	idx atomic.Int64
+}
+
+func (m *MemStore) Clear() error {
+	var keys []interface{}
+	m.va.Range(func(key, value interface{}) bool {
+		keys = append(keys, key)
+		return true
+	})
+	for _, v := range keys {
+		m.va.Delete(v)
+	}
+	m.idx.Store(0)
+	return nil
 }
 
 type memVoteable struct {
