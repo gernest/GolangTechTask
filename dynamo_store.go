@@ -2,11 +2,14 @@ package GolangTechTask
 
 import (
 	"context"
+	"encoding/base64"
+	"encoding/json"
 	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/buffup/GolangTechTask/api"
 	"github.com/google/uuid"
 	"github.com/guregu/dynamo"
@@ -81,29 +84,46 @@ func (d *DynamoStore) Create(ctx context.Context, question string, answers []str
 	return u, nil
 }
 
-func (d *DynamoStore) List(ctx context.Context, lastResultIndex int64, limit int) (result []*api.Voteable, lastIndex int64, err error) {
-	var all []DynamoVoteable
-	var last time.Time
-	if lastResultIndex > 0 {
-		last = time.Unix(lastResultIndex, 0)
+func (d *DynamoStore) List(ctx context.Context, lastResultIndex string, limit int) (result []*api.Voteable, lastIndex string, err error) {
+	it := d.table.Scan().SearchLimit(int64(limit)).Iter()
+	if lastResultIndex != "" {
+		from, err := ParseLastIndexKey(lastResultIndex)
+		if err != nil {
+			return nil, "", err
+		}
+		it = d.table.Scan().StartFrom(from).SearchLimit(int64(limit)).Iter()
 	}
-	d.log.Info("List", zap.String("lastResultIndex", last.String()), zap.Int("limit", limit))
-	err = d.table.Scan().
-		Filter("created_at>=?", last).Limit(int64(limit)).All(&all)
-	if err != nil {
-		d.log.Error("Failed to list voatables", zap.Error(err))
-		return nil, 0, err
-	}
-	d.log.Info("List Ok", zap.Int("count", len(all)))
-	for _, v := range all {
+	var v DynamoVoteable
+	for it.Next(&v) {
 		result = append(result, &api.Voteable{
 			Uuid:     v.UUID,
 			Question: v.Question,
 			Answers:  v.Answers,
 		})
-		lastIndex = v.CreatedAt.Unix()
 	}
+	lastIndex, err = LastIndexKey(it.LastEvaluatedKey())
 	return
+}
+
+func LastIndexKey(key dynamo.PagingKey) (string, error) {
+	m := map[string]interface{}{}
+	if err := dynamodbattribute.UnmarshalMap(key, &m); err != nil {
+		return "", err
+	}
+	b, _ := json.Marshal(m)
+	return base64.StdEncoding.EncodeToString(b), nil
+}
+
+func ParseLastIndexKey(key string) (dynamo.PagingKey, error) {
+	b, err := base64.StdEncoding.DecodeString(key)
+	if err != nil {
+		return nil, err
+	}
+	m := map[string]interface{}{}
+	if err := json.Unmarshal(b, &m); err != nil {
+		return nil, err
+	}
+	return dynamodbattribute.MarshalMap(m)
 }
 
 func (d *DynamoStore) Cast(ctx context.Context, id string, answer int) error {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"sort"
+	"strconv"
 	"sync"
 
 	"github.com/buffup/GolangTechTask/api"
@@ -19,7 +20,7 @@ var ErrWrongIndex = errors.New("ErrWrongIndex")
 
 type Store interface {
 	Create(ctx context.Context, question string, answers []string) (uuid string, ee error)
-	List(ctx context.Context, lastResultIndex int64, limit int) (result []*api.Voteable, lastIndex int64, err error)
+	List(ctx context.Context, lastResultIndex string, limit int) (result []*api.Voteable, lastIndex string, err error)
 	Cast(ctx context.Context, id string, answer int) error
 	// Clear is needed for testing purpose only. This deletes everything and resets
 	// the storage state
@@ -66,7 +67,8 @@ func (m *MemStore) Create(ctx context.Context, question string, answers []string
 	return u, nil
 }
 
-func (m *MemStore) List(ctx context.Context, lastResultIndex int64, limit int) (result []*api.Voteable, lastIndex int64, err error) {
+func (m *MemStore) List(ctx context.Context, lastResultIndexStr string, limit int) (result []*api.Voteable, lastIndex string, err error) {
+	lastResultIndex, _ := strconv.ParseInt(lastResultIndexStr, 10, 64)
 	var all []*memVoteable
 	m.va.Range(func(key, value interface{}) bool {
 		all = append(all, value.(*memVoteable))
@@ -78,7 +80,7 @@ func (m *MemStore) List(ctx context.Context, lastResultIndex int64, limit int) (
 	for _, v := range all {
 		if v.index > lastResultIndex && len(result) < limit {
 			result = append(result, v.va)
-			lastIndex = v.index
+			lastIndex = strconv.FormatInt(v.index, 10)
 		}
 	}
 	return

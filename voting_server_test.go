@@ -93,7 +93,7 @@ func VotingServerTest(t *testing.T, store Store) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if res.LastIndex == 0 {
+			if res.LastIndex == "" {
 				t.Fatal("expected last index to be non zero")
 			}
 			res, err = svr.ListVoteables(ctx, &api.ListVoteableRequest{
@@ -115,7 +115,7 @@ func VotingServerTest(t *testing.T, store Store) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			if res.LastIndex == 0 {
+			if res.LastIndex == "" {
 				t.Fatal("expected last index to be non zero")
 			}
 			res, err = svr.ListVoteables(ctx, &api.ListVoteableRequest{
