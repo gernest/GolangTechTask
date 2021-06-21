@@ -37,17 +37,17 @@ type memVoteable struct {
 }
 
 func (m *MemStore) Create(ctx context.Context, question string, answers []string) (string, error) {
-	u := uuid.New()
+	u := uuid.New().String()
 	v := &api.Voteable{
-		Uuid:     u.String(),
+		Uuid:     u,
 		Question: question,
 		Answers:  answers,
 	}
-	m.va.Store(u.String(), &memVoteable{
+	m.va.Store(u, &memVoteable{
 		index: m.idx.Inc(),
 		va:    v,
 	})
-	return v.String(), nil
+	return u, nil
 }
 
 func (m *MemStore) List(ctx context.Context, lastResultIndex int64, limit int) (result []*api.Voteable, lastIndex int64, err error) {
@@ -84,5 +84,9 @@ func (m *MemStore) Cast(ctx context.Context, id string, answer int) error {
 }
 
 func NewStore(c *Config) (Store, error) {
-	return &MemStore{va: &sync.Map{}}, nil
+	return NewMemStore(), nil
+}
+
+func NewMemStore() *MemStore {
+	return &MemStore{va: &sync.Map{}}
 }
