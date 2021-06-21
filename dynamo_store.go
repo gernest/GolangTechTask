@@ -20,8 +20,8 @@ type DynamoVoteable struct {
 	Question  string    `dynamo:"question"`
 	Answers   []string  `dynamo:"answers,set"`
 	Cast      *int      `dynamo:"cast"`
-	CreatedAt time.Time `dynamo:"created_at,unixtime"`
-	UpdatedAt time.Time `dynamo:"created_at"`
+	CreatedAt time.Time `dynamo:"created_at"`
+	UpdatedAt time.Time `dynamo:"updated_at"`
 }
 
 func NewDynamo(c *Config) (*DynamoStore, error) {
@@ -87,9 +87,9 @@ func (d *DynamoStore) List(ctx context.Context, lastResultIndex int64, limit int
 	if lastResultIndex > 0 {
 		last = time.Unix(lastResultIndex, 0)
 	}
-	d.log.Info("List", zap.Time("lastResultIndex", last), zap.Int("limit", limit))
+	d.log.Info("List", zap.String("lastResultIndex", last.String()), zap.Int("limit", limit))
 	err = d.table.Scan().
-		Filter("created_at>?", last).SearchLimit(int64(limit)).All(&all)
+		Filter("created_at>=?", last).Limit(int64(limit)).All(&all)
 	if err != nil {
 		d.log.Error("Failed to list voatables", zap.Error(err))
 		return nil, 0, err
