@@ -34,7 +34,7 @@ func App() *cli.App {
 			EnvVar: "VOTING_CONFIG_FILE",
 		},
 	}
-	a.Action = run
+	a.Action = command
 	return a
 }
 
@@ -71,14 +71,7 @@ func run(ctx context.Context, c *Config) error {
 }
 
 func serve(ctx context.Context, store Store, c *Config, ls net.Listener) error {
-	m := Logger.Named("main")
-	m.Info("Starting listener for votable service", zap.Int("port", c.Port))
-	ls, err := net.Listen("tcp", fmt.Sprintf(":%d", c.Port))
-	if err != nil {
-		return err
-	}
 	s := grpc.NewServer()
-
 	api.RegisterVotingServiceServer(s, &Server{
 		store: store,
 	})
