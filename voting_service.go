@@ -15,6 +15,9 @@ import (
 
 type Config struct {
 	Port int
+
+	Endpoint string
+	Region   string
 }
 
 func App() *cli.App {
@@ -33,6 +36,18 @@ func App() *cli.App {
 			Usage:  "Path to the configuration file",
 			EnvVar: "VOTING_CONFIG_FILE",
 		},
+		cli.StringFlag{
+			Name:   "region,r",
+			Usage:  "aws region",
+			EnvVar: "VOTING_AWS_REGION",
+			Value:  "local",
+		},
+		cli.StringFlag{
+			Name:   "endpoint,e",
+			Usage:  "dynamodb endpoint",
+			EnvVar: "VOTING_DYNAMODB_ENDPOINT",
+			Value:  "http://localhost:8000",
+		},
 	}
 	a.Action = command
 	return a
@@ -40,7 +55,9 @@ func App() *cli.App {
 
 func command(ctx *cli.Context) error {
 	c := &Config{
-		Port: ctx.GlobalInt("port"),
+		Port:     ctx.GlobalInt("port"),
+		Endpoint: ctx.GlobalString("endpoint"),
+		Region:   ctx.GlobalString("region"),
 	}
 	if config := ctx.GlobalString("config"); config != "" {
 		f, err := os.Open(config)
