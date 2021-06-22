@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-sdk-go v1.38.0
 	github.com/golang/protobuf v1.5.2
 	github.com/google/uuid v1.1.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/guregu/dynamo v1.10.4
 	github.com/urfave/cli v1.22.5
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.21.0
