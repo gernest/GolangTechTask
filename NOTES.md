@@ -20,7 +20,7 @@ NAME:
    Voting Service - Simple gRPC service for voting
 
 USAGE:
-   voding_service [global options] command [command options] [arguments...]
+   voting_service [global options] command [command options] [arguments...]
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
@@ -30,6 +30,8 @@ GLOBAL OPTIONS:
    --config value, -c value    Path to the configuration file [$VOTING_CONFIG_FILE]
    --region value, -r value    aws region (default: "local") [$VOTING_AWS_REGION]
    --endpoint value, -e value  dynamodb endpoint (default: "http://localhost:8000") [$VOTING_DYNAMODB_ENDPOINT]
+   --mem, -m                   Uses an in memory storage [$VOTING_MEMORY_STORE]
+   --trace, -t                 Enable open tracing, the traces will be exported to stdout [$VOTING_TRACE]
    --help, -h                  show help
 ```
 
