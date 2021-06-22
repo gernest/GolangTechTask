@@ -15,10 +15,10 @@ import (
 )
 
 type Config struct {
-	Port int
-
+	Port     int
 	Endpoint string
 	Region   string
+	Memory   bool
 }
 
 func App() *cli.App {
@@ -49,6 +49,11 @@ func App() *cli.App {
 			EnvVar: "VOTING_DYNAMODB_ENDPOINT",
 			Value:  "http://localhost:8000",
 		},
+		cli.BoolFlag{
+			Name:   "mem,m",
+			Usage:  "Uses an in memory storage",
+			EnvVar: "VOTING_MEMORY_STORE",
+		},
 	}
 	a.Action = command
 	return a
@@ -59,6 +64,7 @@ func command(ctx *cli.Context) error {
 		Port:     ctx.GlobalInt("port"),
 		Endpoint: ctx.GlobalString("endpoint"),
 		Region:   ctx.GlobalString("region"),
+		Memory:   ctx.GlobalBool("mem"),
 	}
 	if config := ctx.GlobalString("config"); config != "" {
 		f, err := os.Open(config)

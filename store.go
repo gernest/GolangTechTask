@@ -102,7 +102,10 @@ func (m *MemStore) Cast(ctx context.Context, id string, answer int) error {
 }
 
 func NewStore(c *Config) (Store, error) {
-	return NewMemStore(), nil
+	if c.Memory {
+		return NewMemStore(), nil
+	}
+	return NewDynamo(c)
 }
 
 func NewMemStore() *MemStore {
