@@ -7,7 +7,7 @@
 This requires a `go1.16+` compiler. If you have cloned this repo then build it by running.
 
 ```shell
-mkdir bin
+mkdir -p bin
 make
 ```
 
@@ -89,4 +89,14 @@ There is a client sample included in `cmd/voting_client/` that connects to the s
 
 --> response
 {"level":"info","ts":1624353109.188828,"logger":"main.Client","msg":"client response payload logged as grpc.response.content","system":"grpc","span.kind":"client","grpc.service":"api.VotingService","grpc.method":"ListVoteables","grpc.response.content":{"msg":{"votables":[{"uuid":"787555e1-6105-4525-8540-74fa56c16d6f","question":"0 - Truth or Dare?","answers":["Dare","Truth"]}],"lastIndex":"e30="}}}
+```
+
+## CastVote
+
+```shell
+--> request
+{"level":"info","ts":1624355156.177943,"logger":"main.Client","msg":"client request payload logged as grpc.request.content","system":"grpc","span.kind":"client","grpc.service":"api.VotingService","grpc.method":"CastVote","grpc.request.content":{"msg":{"uuid":"78c7699b-37e9-425a-a477-f068cdc143f2"}}}
+
+--> response
+{"level":"info","ts":1624355156.347154,"logger":"main.Client","msg":"client response payload logged as grpc.response.content","system":"grpc","span.kind":"client","grpc.service":"api.VotingService","grpc.method":"CastVote","grpc.response.content":{"msg":{"status":"ok"}}}
 ```
