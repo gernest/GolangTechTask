@@ -19,6 +19,7 @@ type Config struct {
 	Endpoint string
 	Region   string
 	Memory   bool
+	Trace    bool
 }
 
 func App() *cli.App {
@@ -54,6 +55,11 @@ func App() *cli.App {
 			Usage:  "Uses an in memory storage",
 			EnvVar: "VOTING_MEMORY_STORE",
 		},
+		cli.BoolFlag{
+			Name:   "trace,t",
+			Usage:  "Enable open tracing, the traces will be exported to stdout",
+			EnvVar: "VOTING_TRACE",
+		},
 	}
 	a.Action = command
 	return a
@@ -65,6 +71,7 @@ func command(ctx *cli.Context) error {
 		Endpoint: ctx.GlobalString("endpoint"),
 		Region:   ctx.GlobalString("region"),
 		Memory:   ctx.GlobalBool("mem"),
+		Trace:    ctx.GlobalBool("trace"),
 	}
 	if config := ctx.GlobalString("config"); config != "" {
 		f, err := os.Open(config)
@@ -89,7 +96,7 @@ func run(ctx context.Context, c *Config) error {
 	}
 	store.Clear()
 	m.Info("Setting up open telemetry")
-	tp, err := CreateOpenTelemetry()
+	tp, err := CreateOpenTelemetry(c)
 	if err != nil {
 		return err
 	}
