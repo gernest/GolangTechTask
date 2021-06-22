@@ -135,7 +135,5 @@ func (d *DynamoStore) Cast(ctx context.Context, id string, answer int) error {
 	if answer < 0 || answer > len(a.Answers) {
 		return ErrWrongIndex
 	}
-	a.Cast = &answer
-	a.UpdatedAt = time.Now()
-	return d.table.Update(id, a).Run()
+	return d.table.Update("uuid", a.UUID).Set("cast", answer).Run()
 }
