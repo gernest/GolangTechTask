@@ -18,6 +18,7 @@ func main() {
 	decider := func(ctx context.Context, fullMethodName string) bool { return true }
 
 	x, err := grpc.Dial(":8080",
+		grpc.WithInsecure(),
 		grpc.WithUnaryInterceptor(grpc_zap.PayloadUnaryClientInterceptor(log, decider)),
 	)
 	if err != nil {

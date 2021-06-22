@@ -77,7 +77,7 @@ func command(ctx *cli.Context) error {
 		}
 		f.Close()
 	}
-	return run(context.Background(), &Config{})
+	return run(context.Background(), c)
 }
 
 func run(ctx context.Context, c *Config) error {
