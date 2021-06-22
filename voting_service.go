@@ -87,6 +87,7 @@ func run(ctx context.Context, c *Config) error {
 	if err != nil {
 		return err
 	}
+	store.Clear()
 	m.Info("Setting up open telemetry")
 	tp, err := CreateOpenTelemetry()
 	if err != nil {
