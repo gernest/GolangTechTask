@@ -1,4 +1,22 @@
+
+
 # Notes on how to use this service
+
+# Completed features
+
+| Functionality | Status |
+|----------------|---------|
+| Go gRPC service | ✅ |
+| Dynamo based store | ✅ |
+| Pagination for `ListVoteables` RPC call | ✅ |
+| Open telemetry tracing with stdout export support | ✅ |
+| Prometheus metrics | ❌️ |
+| Configuration and secret management | ✅ |
+
+
+# Limitation
+
+- Only one vote cast per voteable
 
 # Commandline app
 

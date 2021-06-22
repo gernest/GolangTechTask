@@ -1,16 +1,5 @@
 # Golang Tech Test
 
-# Completed features
-
-| Functionality | Status |
-|----------------|---------|
-| Go gRPC service | ✅ |
-| Dynamo based store | ✅ |
-| Pagination for `ListVoteables` RPC call | ✅ |
-| Open telemetry tracing with jaeger and zipkin support | ✅ |
-| Prometheus metrics | ❌️ |
-| Configuration and secret management | ✅ |
-
 As part of the recruitment process we want to know how you think, code and structure your work.
 In order to do that, we're going to ask you to complete this coding challenge.
 
