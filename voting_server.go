@@ -44,17 +44,17 @@ func (s *Server) CastVote(ctx context.Context, a *api.CastVoteRequest) (*api.Cas
 		if errors.Is(err, ErrNotFound) {
 			return &api.CastVoteResponse{
 				Status: fmt.Sprintf("Votable %q was not found", a.Uuid),
-			}, err
+			}, nil
 		}
 		if errors.Is(err, ErrAlreadyVoted) {
 			return &api.CastVoteResponse{
 				Status: "Forbidden tou cant cast vote more than once",
-			}, err
+			}, nil
 		}
 		if errors.Is(err, ErrWrongIndex) {
 			return &api.CastVoteResponse{
 				Status: "Wrong answer index",
-			}, err
+			}, nil
 		}
 		return nil, err
 
